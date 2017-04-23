@@ -175,7 +175,7 @@ if not os.path.exists('out/'):
 i = 0
 writer = tf.summary.FileWriter("../", graph=tf.get_default_graph())
 distribution = []
-for it in range(100000):
+for it in range(1000000):
     X_mb, _ = mnist.train.next_batch(mb_size)
 
     _, loss = sess.run([solver, vae_loss], feed_dict={X: X_mb})

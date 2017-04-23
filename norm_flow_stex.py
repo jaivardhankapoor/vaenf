@@ -1,3 +1,16 @@
+'''This script demonstrates how to build a variational autoencoder with Keras.
+Reference: "Auto-Encoding Variational Bayes" https://arxiv.org/abs/1312.6114
+'''
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
+from keras.layers import Input, Dense, Lambda, Layer
+from keras.models import Model
+from keras import backend as K
+from keras import metrics
+from keras.datasets import mnist
+
 def sampling(args):
     z_mean, z_log_var = args
 
@@ -40,13 +53,6 @@ def transform_z0(args):
     # generate z1
     z1 = z0 + K.dot(diag2,u2) 
     return z1
-
-def vae_loss(x, x_decoded_mean):
-    xent_loss = K.mean(objectives.categorical_crossentropy(x, x_decoded_mean), -1)
-    ln_q0z0 = K.sum(log_normal2(z0, z_mean, z_log_var, eps=1e-6), -1)
-    ln_pz1 = K.sum(log_stdnormal(z1), -1)
-    result = K.mean(logdet + ln_pz1 + xent_loss - ln_q0z0)
-    return result
 
 # and here is the loss
 def vae_loss(x, x_decoded_mean):
