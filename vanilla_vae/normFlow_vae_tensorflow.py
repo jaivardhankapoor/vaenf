@@ -3,11 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
+import sys
 # from torch.autograd import Variable
 from tensorflow.examples.tutorials.mnist import input_data
 config = tf.ConfigProto(
         device_count = {'GPU': 0}
     )
+
+if len(sys.argv) < 2:
+    print "Incorrect no. of arguments"
+    print "Usage : python normFlow_vae_tensorflow.py plot_or_not"
+    sys.exit()
+
+# Read the bool to plot the graph
+plot = sys.argv[1]
 
 mnist = input_data.read_data_sets('../../MNIST_data', one_hot=True)
 mb_size = 1
@@ -153,7 +162,8 @@ psi_5 = tf.matmul(w_5,tf.transpose(1-tf.multiply(tf.tanh(zwb_5), tf.tanh(zwb_5))
 psi_u_5 = tf.matmul(tf.transpose(psi_5), u_hat_5)
 
 
-logdet_jacobian = tf.log(tf.abs(1 + psi_u))+tf.log(tf.abs(1 + psi_u_2))+tf.log(tf.abs(1 + psi_u_3))+tf.log(tf.abs(1 + psi_u_4))+tf.log(tf.abs(1 + psi_u_5))
+logdet_jacobian = tf.log(tf.abs(1 + psi_u))+tf.log(tf.abs(1 + psi_u_2))\
++tf.log(tf.abs(1 + psi_u_3))+tf.log(tf.abs(1 + psi_u_4))+tf.log(tf.abs(1 + psi_u_5))
 _, logits = P(f_z_5)  # add flows thing in P
 
 
@@ -161,6 +171,7 @@ X_samples, _ = P(z)
 
 # E[log P(X|z_k)]
 recon_loss = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=X), 1)
+reconstruction_loss = tf.reduce_mean(recon_loss)
 # D_KL(Q(z|X) || P(z|X)); calculate in closed form as both dist. are Gaussian
 kl_loss = 0.5 * tf.reduce_sum(tf.exp(z_logvar) + z_mu**2 - 1. - z_logvar, 1)
  # VAE loss
@@ -200,11 +211,13 @@ f6 = open('flow_samples_6.txt','w')
 f7 = open('flow_samples_7.txt','w')
 f8 = open('flow_samples_8.txt','w')
 f9 = open('flow_samples_9.txt','w')
+
 f_all = open('flow_samples_all.txt','w')
+f_recon_loss = open('recun_loss_4_layes.txt','w')
 for it in range(500000):
     X_mb, Y_mb = mnist.train.next_batch(mb_size)
 
-    _, loss = sess.run([solver, vae_loss], feed_dict={X: X_mb})
+    _, loss, reconstruction_error = sess.run([solver, vae_loss, reconstruction_loss], feed_dict={X: X_mb})
     
     if ((Y_mb[0,0]) == 1):
         distribution[0].append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
@@ -231,8 +244,9 @@ for it in range(500000):
 
     if it % 1000 == 0:
         print('Iter: {}'.format(it))
-        print('Loss: {:.4}'. format(loss))
-        # print()
+        print('Loss: {:.4}'.format(loss))
+        print('recon loss: {:.4}'.format(reconstruction_error))
+        f_recon_loss.write(str(reconstruction_error)+' '+str(loss)+'\n')
         
         samples = sess.run(X_samples, feed_dict={z: np.random.randn(16, z_dim)})
 
@@ -240,6 +254,7 @@ for it in range(500000):
         plt.savefig('out/{}.png'.format(str(i).zfill(3)), bbox_inches='tight')
         i += 1
         plt.close(fig)
+
 
 import pickle 
 
@@ -255,49 +270,54 @@ pickle.dump(distribution[8],f8)
 pickle.dump(distribution[9],f9)
 pickle.dump(distribution_all,f_all)
 
-# import pickle
-# import numpy as np
-# from scipy.stats import gaussian_kde
-# import matplotlib.pyplot as plt
 
-# for i in range(0,9):
-#     filname = 'flow_samples_' + str(i) + '.txt'
-#     with open(filname,'r') as f:
-#         data = pickle.loads(f.read())
-#     x = []
-#     y = []
-#     # print(len(data))
-#     for j in range(0,len(data)):
-#         x.append(data[j][0][0])
-#         y.append(data[j][0][1])
-#     # print(data)
-#     # len(y)
-#     xy =np.vstack([x,y])
-#     z = gaussian_kde(xy)(xy)
-#     fig, ax = plt.subplots()
-#     ax.scatter(x, y, c=z, s=100, edgecolor='')
-#     plt.savefig('plot' + str(i)+ '.pdf'  )
 
-# import numpy as np
-# from scipy.stats import gaussian_kde
+if plot_graph:
+    import pickle
+    import numpy as np
+    from scipy.stats import gaussian_kde
+    import matplotlib.pyplot as plt
 
-# import matplotlib.pyplot as plt
-# # for j in range(0,9):
-# data = (distribution[0])[-5000:]
-# x = []
-# y = []
-# len(data)
-# x.append(data[i][0][0])
-# y.append(data[i][0][1])
+    fig, ax = plt.subplots()
+    markers = ['v','^','d','_','|','s','8','s','p','*']
 
-# len(x)
-# len(y)
-# # Calculate the point density
-# xy = np.vstack([x,y])
-# z = gaussian_kde(xy)(xy)
 
-# fig, ax = plt.subplots()
-# ax.scatter(x, y, c=z, s=100, edgecolor='')
-# # plt.savefig()
+    filname = 'flow_samples_all.txt'
+    with open(filname,'r') as f:
+        data = pickle.loads(f.read())
+    x = []
+    y = []
+    # print(len(data))
+    for j in range(0,len(data[1:50000])):
+        x.append(data[j][0][0])
+        y.append(data[j][0][1])
+        # print(j)
+    # print(data)
+    # len(y)
+    xy =np.vstack([x,y])
+    z = (gaussian_kde(xy)(xy))
+    # x_m = sum(x) / float(len(x))
+    # y_m = sum(y) / float(len(x))
+    ax.scatter(x, y, c=z, s=10, edgecolor='')
 
-# # for i in range(0,len(data)):
+    print("main_done")
+    for i in range(0,10):
+        filname = 'flow_samples_' + str(i) + '.txt'
+        with open(filname,'r') as f:
+            data = pickle.loads(f.read())
+        x = []
+        y = []
+        # print(len(data))
+        for j in range(0,len(data[1:5000])):
+            x.append(data[j][0][0])
+            y.append(data[j][0][1])
+        # print(data)
+        # len(y)
+        # xy =np.vstack([x,y])
+        # z = (gaussian_kde(xy)(xy))*(i+.1)/10.0
+        x_m = sum(x) / float(len(x))
+        y_m = sum(y) / float(len(x))
+        ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
+        print(i)
+    plt.savefig('plot' + '.png')
+
