@@ -93,6 +93,7 @@ X_samples, _ = P(z)
 print(X_samples.get_shape())
 # E[log P(X|z)]
 recon_loss = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=X), 1)
+reconstruction_loss = tf.reduce_mean(recon_loss)
 # D_KL(Q(z|X) || P(z|X)); calculate in closed form as both dist. are Gaussian
 kl_loss = 0.5 * tf.reduce_sum(tf.exp(z_logvar) + z_mu**2 - 1. - z_logvar, 1)
 # VAE loss
@@ -117,37 +118,40 @@ distribution_6 = []
 distribution_7 = []
 distribution_8 = []
 distribution_9 = []
+f_recon_loss = open('vae_recun_loss_4_layes.txt','w')
 for it in range(1000000):
     X_mb, Y_mb = mnist.train.next_batch(mb_size)
 
-    _, loss = sess.run([solver, vae_loss], feed_dict={X: X_mb})
+    _, loss, reconstruction_error = sess.run([solver, vae_loss, reconstruction_loss], feed_dict={X: X_mb})
     
-    if (print(Y_mb[0,0]) == 1)
+    if (Y_mb[0,0] == 1):
         distribution_0.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,1]) == 1)
+    elif (Y_mb[0,1] == 1):
         distribution_1.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,2]) == 1)
+    elif (Y_mb[0,2] == 1):
         distribution_2.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,3]) == 1)
+    elif (Y_mb[0,3] == 1):
         distribution_3.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,4]) == 1)
+    elif (Y_mb[0,4] == 1):
         distribution_4.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,5]) == 1)
+    elif (Y_mb[0,5] == 1):
         distribution_5.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,6]) == 1)
+    elif (Y_mb[0,6] == 1):
         distribution_6.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,7]) == 1)
+    elif (Y_mb[0,7] == 1):
         distribution_7.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,8]) == 1)
+    elif (Y_mb[0,8] == 1):
         distribution_8.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
-    else if (print(Y_mb[0,9]) == 1)
+    elif (Y_mb[0,9] == 1):
         distribution_9.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
 
 
     if it % 1000 == 0:
         print('Iter: {}'.format(it))
         print('Loss: {:.4}'. format(loss))
-        # print()
+        print('recon loss: {:.4}'.format(reconstruction_error))
+
+        f_recon_loss.write(str(reconstruction_error)+' '+str(loss)+'\n')
         
         import pickle
         with open('original_samples.txt','w') as f:
