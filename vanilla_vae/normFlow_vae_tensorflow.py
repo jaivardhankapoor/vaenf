@@ -3,11 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
+import sys
 # from torch.autograd import Variable
 from tensorflow.examples.tutorials.mnist import input_data
 config = tf.ConfigProto(
         device_count = {'GPU': 0}
     )
+
+if len(sys.argv) < 2:
+    print "Incorrect no. of arguments"
+    print "Usage : python normFlow_vae_tensorflow.py plot_or_not"
+    sys.exit()
+
+# Read the bool to plot the graph
+plot = sys.argv[1]
 
 mnist = input_data.read_data_sets('../../MNIST_data', one_hot=True)
 mb_size = 1
@@ -233,8 +242,7 @@ for it in range(500000):
         print('Iter: {}'.format(it))
         print('Loss: {:.4}'.format(loss))
         print('recon loss: {:.4}'.format(reconstruction_error))
-        f_recon_loss.write(str(reconstruction_error))
-        f_recon_loss.write('\n')
+        f_recon_loss.write(str(reconstruction_error)+' '+str(loss)+'\n')
         
         import pickle
         pickle.dump(distribution[0],f0)
@@ -256,39 +264,31 @@ for it in range(500000):
         plt.close(fig)
 
 
-
-# import pickle
-# with open('samples.txt','w') as f:
-#     pickle.dump(distribution,f)
-
-# f.close()
-
-import pickle
-with open('samples.txt','r') as f:
-    data = pickle.load(f)
+if plot_graph:
+    import pickle
+    with open('samples.txt','r') as f:
+        data = pickle.load(f)
 
 
-import numpy as np
-from scipy.stats import gaussian_kde
+    import numpy as np
+    from scipy.stats import gaussian_kde
 
-import matplotlib.pyplot as plt
-for j in range(0,9):
-    data = (distribution[j])[-5000:]
-x= []
-y= []
-len(data)
-x.append(data[i][0][0])
-y.append(data[i][0][1])
+    import matplotlib.pyplot as plt
+    for j in range(0,9):
+        data = (distribution[j])[-5000:]
+    x= []
+    y= []
+    len(data)
+    x.append(data[i][0][0])
+    y.append(data[i][0][1])
 
-len(x)
-len(y)
-# Calculate the point density
-xy = np.vstack([x,y])
-z = gaussian_kde(xy)(xy)
+    len(x)
+    len(y)
+    # Calculate the point density
+    xy = np.vstack([x,y])
+    z = gaussian_kde(xy)(xy)
 
-fig, ax = plt.subplots()
-ax.scatter(x, y, c=z, s=100, edgecolor='')
-plt.savefig()
-savefig('foo' + str(j)+ '.pdf')
-
-# for i in range(0,len(data)):
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, c=z, s=100, edgecolor='')
+    plt.savefig()
+    savefig('foo' + str(j)+ '.pdf')
