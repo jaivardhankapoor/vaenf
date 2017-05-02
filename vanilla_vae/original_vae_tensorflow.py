@@ -9,7 +9,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 mnist = input_data.read_data_sets('../../MNIST_data', one_hot=True)
 mb_size = 1
-z_dim = 2
+z_dim = 100
 X_dim = mnist.train.images.shape[1]
 y_dim = mnist.train.labels.shape[1]
 h_dim = 128
@@ -107,21 +107,60 @@ if not os.path.exists('original_out/'):
     os.makedirs('original_out/')
 
 i = 0
-distribution = []
-for it in range(100000):
-    X_mb, _ = mnist.train.next_batch(mb_size)
+distribution_0 = []
+distribution_1 = []
+distribution_2 = []
+distribution_3 = []
+distribution_4 = []
+distribution_5 = []
+distribution_6 = []
+distribution_7 = []
+distribution_8 = []
+distribution_9 = []
+for it in range(1000000):
+    X_mb, Y_mb = mnist.train.next_batch(mb_size)
 
     _, loss = sess.run([solver, vae_loss], feed_dict={X: X_mb})
-    distribution.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    
+    if (print(Y_mb[0,0]) == 1)
+        distribution_0.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,1]) == 1)
+        distribution_1.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,2]) == 1)
+        distribution_2.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,3]) == 1)
+        distribution_3.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,4]) == 1)
+        distribution_4.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,5]) == 1)
+        distribution_5.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,6]) == 1)
+        distribution_6.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,7]) == 1)
+        distribution_7.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,8]) == 1)
+        distribution_8.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    else if (print(Y_mb[0,9]) == 1)
+        distribution_9.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+
 
     if it % 1000 == 0:
         print('Iter: {}'.format(it))
         print('Loss: {:.4}'. format(loss))
-        print()
-
+        # print()
+        
         import pickle
         with open('original_samples.txt','w') as f:
-            pickle.dump(distribution,f)
+            pickle.dump(distribution_0,f)
+            pickle.dump(distribution_1,f)
+            pickle.dump(distribution_2,f)
+            pickle.dump(distribution_3,f)
+            pickle.dump(distribution_4,f)
+            pickle.dump(distribution_5,f)
+            pickle.dump(distribution_6,f)
+            pickle.dump(distribution_7,f)
+            pickle.dump(distribution_8,f)
+            pickle.dump(distribution_9,f)
 
         samples = sess.run(X_samples, feed_dict={z: np.random.randn(16, z_dim)})
         fig = plot(samples)
@@ -129,36 +168,36 @@ for it in range(100000):
         i += 1
         plt.close(fig)
 
-import pickle
-with open('original_samples.txt','w') as f:
-    pickle.dump(distribution,f)
+# import pickle
+# with open('original_samples.txt','w') as f:
+#     pickle.dump(distribution,f)
 
-f.close()
+# f.close()
 
-import pickle
-with open('original_samples.txt','r') as f:
-    data = pickle.load(f)
+# import pickle
+# with open('original_samples.txt','r') as f:
+#     data = pickle.load(f)
 
 
-import numpy as np
-from scipy.stats import gaussian_kde
+# import numpy as np
+# from scipy.stats import gaussian_kde
 
-import matplotlib.pyplot as plt
-from matplotlib import *
-data = distribution
-x= []
-y= []
-len(data)
-for i in range(0,len(data)):
-    x.append(data[i][0][0])
-    y.append(data[i][0][1])
+# import matplotlib.pyplot as plt
+# from matplotlib import *
+# data = distribution
+# x= []
+# y= []
+# len(data)
+# for i in range(0,len(data)):
+#     x.append(data[i][0][0])
+#     y.append(data[i][0][1])
 
-len(x)
-len(y)
-# Calculate the point density
-xy = np.vstack([x,y])
-z = gaussian_kde(xy)(xy)
+# len(x)
+# len(y)
+# # Calculate the point density
+# xy = np.vstack([x,y])
+# z = gaussian_kde(xy)(xy)
 
-fig, ax = plt.subplots()
-ax.scatter(x, y, c=z, s=100, edgecolor='')
-plt.show()
+# fig, ax = plt.subplots()
+# ax.scatter(x, y, c=z, s=100, edgecolor='')
+# plt.show()
