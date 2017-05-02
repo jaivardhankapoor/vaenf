@@ -175,9 +175,10 @@ if not os.path.exists('out/'):
     os.makedirs('out/')
 
 i = 0
-writer = tf.summary.FileWriter("../", graph=tf.get_default_graph())
+# writer = tf.summary.FileWriter("../", graph=tf.get_default_graph())
 
 distribution = {}
+distribution_all = []
 distribution[0] = []
 distribution[1] = []
 distribution[2] = []
@@ -188,7 +189,7 @@ distribution[6] = []
 distribution[7] = []
 distribution[8] = []
 distribution[9] = []
-
+print(type(distribution[0]))
 f0 = open('flow_samples_0.txt','w')
 f1 = open('flow_samples_1.txt','w')
 f2 = open('flow_samples_2.txt','w')
@@ -199,6 +200,7 @@ f6 = open('flow_samples_6.txt','w')
 f7 = open('flow_samples_7.txt','w')
 f8 = open('flow_samples_8.txt','w')
 f9 = open('flow_samples_9.txt','w')
+f_all = open('flow_samples_all.txt','w')
 for it in range(500000):
     X_mb, Y_mb = mnist.train.next_batch(mb_size)
 
@@ -224,6 +226,7 @@ for it in range(500000):
         distribution[8].append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
     elif ((Y_mb[0,9]) == 1):
         distribution[9].append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
+    distribution_all.append(sess.run(z_sample,feed_dict={X: X_mb}).tolist())
 
 
     if it % 1000 == 0:
@@ -231,18 +234,6 @@ for it in range(500000):
         print('Loss: {:.4}'. format(loss))
         # print()
         
-        import pickle
-        pickle.dump(distribution[0],f0)
-        pickle.dump(distribution[1],f1)
-        pickle.dump(distribution[2],f2)
-        pickle.dump(distribution[3],f3)
-        pickle.dump(distribution[4],f4)
-        pickle.dump(distribution[5],f5)
-        pickle.dump(distribution[6],f6)
-        pickle.dump(distribution[7],f7)
-        pickle.dump(distribution[8],f8)
-        pickle.dump(distribution[9],f9)
-
         samples = sess.run(X_samples, feed_dict={z: np.random.randn(16, z_dim)})
 
         fig = plot(samples)
@@ -250,38 +241,63 @@ for it in range(500000):
         i += 1
         plt.close(fig)
 
+import pickle 
+
+pickle.dump(distribution[0],f0)
+pickle.dump(distribution[1],f1)
+pickle.dump(distribution[2],f2)
+pickle.dump(distribution[3],f3)
+pickle.dump(distribution[4],f4)
+pickle.dump(distribution[5],f5)
+pickle.dump(distribution[6],f6)
+pickle.dump(distribution[7],f7)
+pickle.dump(distribution[8],f8)
+pickle.dump(distribution[9],f9)
+pickle.dump(distribution_all,f_all)
+
 # import pickle
-# with open('samples.txt','w') as f:
-#     pickle.dump(distribution,f)
+# import numpy as np
+# from scipy.stats import gaussian_kde
+# import matplotlib.pyplot as plt
 
-# f.close()
+# for i in range(0,9):
+#     filname = 'flow_samples_' + str(i) + '.txt'
+#     with open(filname,'r') as f:
+#         data = pickle.loads(f.read())
+#     x = []
+#     y = []
+#     # print(len(data))
+#     for j in range(0,len(data)):
+#         x.append(data[j][0][0])
+#         y.append(data[j][0][1])
+#     # print(data)
+#     # len(y)
+#     xy =np.vstack([x,y])
+#     z = gaussian_kde(xy)(xy)
+#     fig, ax = plt.subplots()
+#     ax.scatter(x, y, c=z, s=100, edgecolor='')
+#     plt.savefig('plot' + str(i)+ '.pdf'  )
 
-import pickle
-with open('samples.txt','r') as f:
-    data = pickle.load(f)
+# import numpy as np
+# from scipy.stats import gaussian_kde
 
+# import matplotlib.pyplot as plt
+# # for j in range(0,9):
+# data = (distribution[0])[-5000:]
+# x = []
+# y = []
+# len(data)
+# x.append(data[i][0][0])
+# y.append(data[i][0][1])
 
-import numpy as np
-from scipy.stats import gaussian_kde
+# len(x)
+# len(y)
+# # Calculate the point density
+# xy = np.vstack([x,y])
+# z = gaussian_kde(xy)(xy)
 
-import matplotlib.pyplot as plt
-for j in range(0,9):
-    data = (distribution[j])[-5000:]
-x= []
-y= []
-len(data)
-x.append(data[i][0][0])
-y.append(data[i][0][1])
+# fig, ax = plt.subplots()
+# ax.scatter(x, y, c=z, s=100, edgecolor='')
+# # plt.savefig()
 
-len(x)
-len(y)
-# Calculate the point density
-xy = np.vstack([x,y])
-z = gaussian_kde(xy)(xy)
-
-fig, ax = plt.subplots()
-ax.scatter(x, y, c=z, s=100, edgecolor='')
-plt.savefig()
-    savefig('foo' + str(j)+ '.pdf')
-
-# for i in range(0,len(data)):
+# # for i in range(0,len(data)):
