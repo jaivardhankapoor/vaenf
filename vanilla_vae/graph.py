@@ -13,7 +13,8 @@ with open(filname,'r') as f:
 x = []
 y = []
 # print(len(data))
-for j in range(0,len(data[1:5000])):
+for j in range(len(data)-10000,len(data)):
+    # print(j)
     x.append(data[j][0][0])
     y.append(data[j][0][1])
     # print(j)
@@ -25,26 +26,26 @@ z = (gaussian_kde(xy)(xy))
 # y_m = sum(y) / float(len(x))
 ax.scatter(x, y, c=z, s=10, edgecolor='')
 
-# print("main_done")
-# for i in range(0,10):
-#     filname = 'flow_samples_' + str(i) + '.txt'
-#     with open(filname,'r') as f:
-#         data = pickle.loads(f.read())
-#     x = []
-#     y = []
-#     # print(len(data))
-#     for j in range(0,len(data[-500:])):
-#         x.append(data[j][0][0])
-#         y.append(data[j][0][1])
-#     # print(data)
-#     # len(y)
-#     # xy =np.vstack([x,y])
-#     # z = (gaussian_kde(xy)(xy))*(i+.1)/10.0
-#     x_m = sum(x) / float(len(x))
-#     y_m = sum(y) / float(len(x))
-#     ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
-#     print(i)
-plt.savefig('plot' + '.png')
+print("main_done")
+for i in range(0,10):
+    filname = 'flow_samples_' + str(i) + '.txt'
+    with open(filname,'r') as f:
+        data = pickle.loads(f.read())
+    x = []
+    y = []
+    # print(len(data))
+    for j in range(len(data)-1000,len(data)):
+        x.append(data[j][0][0])
+        y.append(data[j][0][1])
+    # print(data)
+    # len(y)
+    # xy =np.vstack([x,y])
+    # z = (gaussian_kde(xy)(xy))*(i+.1)/10.0
+    x_m = sum(x) / float(len(x))
+    y_m = sum(y) / float(len(x))
+    ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
+    print(i)
+plt.savefig('plotasa' + '.png')
 # + str(i)+ 
 # import pickle
 # import numpy as np

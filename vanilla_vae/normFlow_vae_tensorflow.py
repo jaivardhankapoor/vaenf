@@ -148,23 +148,11 @@ zwb_4 = tf.matmul(f_z_3,w_4) + b_4
 f_z_4= f_z_3 + tf.multiply( tf.transpose(u_hat_4), tf.tanh(zwb_4))
 psi_4 = tf.matmul(w_4,tf.transpose(1-tf.multiply(tf.tanh(zwb_4), tf.tanh(zwb_4)))) # tanh(x)dx = 1 - tanh(x)**2
 psi_u_4 = tf.matmul(tf.transpose(psi_4), u_hat_4)
-######################################################################################3
-u_5 =  tf.Variable(xavier_init([z_dim,1]),name="U_4")
-w_5 =  tf.Variable(xavier_init([z_dim,1]),name="V_4")
-b_5 =  tf.Variable(xavier_init([1,1])) #scalar
-uw_5 = tf.matmul(tf.transpose(w_5),u_5)
-
-muw_5 = -1 + tf.nn.softplus(uw_5) # = -1 + T.log(1 + T.exp(uw))
-u_hat_5 = u_4 + (muw_5 - uw_5) * w_5 / tf.reduce_sum(tf.matmul(tf.transpose(w_4),w_4))
-zwb_5 = tf.matmul(f_z_4,w_5) + b_5
-f_z_5= f_z_4 + tf.multiply( tf.transpose(u_hat_5), tf.tanh(zwb_5))
-psi_5 = tf.matmul(w_5,tf.transpose(1-tf.multiply(tf.tanh(zwb_5), tf.tanh(zwb_5)))) # tanh(x)dx = 1 - tanh(x)**2
-psi_u_5 = tf.matmul(tf.transpose(psi_5), u_hat_5)
 
 
 logdet_jacobian = tf.log(tf.abs(1 + psi_u))+tf.log(tf.abs(1 + psi_u_2))\
-+tf.log(tf.abs(1 + psi_u_3))+tf.log(tf.abs(1 + psi_u_4))+tf.log(tf.abs(1 + psi_u_5))
-_, logits = P(f_z_5)  # add flows thing in P
++tf.log(tf.abs(1 + psi_u_3))+tf.log(tf.abs(1 + psi_u_4))
+_, logits = P(f_z_4)  # add flows thing in P
 
 
 X_samples, _ = P(z)
@@ -272,52 +260,52 @@ pickle.dump(distribution_all,f_all)
 
 
 
-if plot_graph:
-    import pickle
-    import numpy as np
-    from scipy.stats import gaussian_kde
-    import matplotlib.pyplot as plt
+# if plot_graph:
+#     import pickle
+#     import numpy as np
+#     from scipy.stats import gaussian_kde
+#     import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots()
-    markers = ['v','^','d','_','|','s','8','s','p','*']
+#     fig, ax = plt.subplots()
+#     markers = ['v','^','d','_','|','s','8','s','p','*']
 
 
-    filname = 'flow_samples_all.txt'
-    with open(filname,'r') as f:
-        data = pickle.loads(f.read())
-    x = []
-    y = []
-    # print(len(data))
-    for j in range(0,len(data[1:50000])):
-        x.append(data[j][0][0])
-        y.append(data[j][0][1])
-        # print(j)
-    # print(data)
-    # len(y)
-    xy =np.vstack([x,y])
-    z = (gaussian_kde(xy)(xy))
-    # x_m = sum(x) / float(len(x))
-    # y_m = sum(y) / float(len(x))
-    ax.scatter(x, y, c=z, s=10, edgecolor='')
+#     filname = 'flow_samples_all.txt'
+#     with open(filname,'r') as f:
+#         data = pickle.loads(f.read())
+#     x = []
+#     y = []
+#     # print(len(data))
+#     for j in range(0,len(data[1:50000])):
+#         x.append(data[j][0][0])
+#         y.append(data[j][0][1])
+#         # print(j)
+#     # print(data)
+#     # len(y)
+#     xy =np.vstack([x,y])
+#     z = (gaussian_kde(xy)(xy))
+#     # x_m = sum(x) / float(len(x))
+#     # y_m = sum(y) / float(len(x))
+#     ax.scatter(x, y, c=z, s=10, edgecolor='')
 
-    print("main_done")
-    for i in range(0,10):
-        filname = 'flow_samples_' + str(i) + '.txt'
-        with open(filname,'r') as f:
-            data = pickle.loads(f.read())
-        x = []
-        y = []
-        # print(len(data))
-        for j in range(0,len(data[1:5000])):
-            x.append(data[j][0][0])
-            y.append(data[j][0][1])
-        # print(data)
-        # len(y)
-        # xy =np.vstack([x,y])
-        # z = (gaussian_kde(xy)(xy))*(i+.1)/10.0
-        x_m = sum(x) / float(len(x))
-        y_m = sum(y) / float(len(x))
-        ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
-        print(i)
-    plt.savefig('plot' + '.png')
+#     print("main_done")
+#     for i in range(0,10):
+#         filname = 'flow_samples_' + str(i) + '.txt'
+#         with open(filname,'r') as f:
+#             data = pickle.loads(f.read())
+#         x = []
+#         y = []
+#         # print(len(data))
+#         for j in range(0,len(data[1:5000])):
+#             x.append(data[j][0][0])
+#             y.append(data[j][0][1])
+#         # print(data)
+#         # len(y)
+#         # xy =np.vstack([x,y])
+#         # z = (gaussian_kde(xy)(xy))*(i+.1)/10.0
+#         x_m = sum(x) / float(len(x))
+#         y_m = sum(y) / float(len(x))
+#         ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
+#         print(i)
+#     plt.savefig('plot' + '.png')
 
