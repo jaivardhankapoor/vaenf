@@ -4,7 +4,7 @@ from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
-markers = ['v','^','d','_','|','s','8','s','p','*']
+markers = ['v','^','d','*','o','s','8','s','p','>']
 
 
 filname = 'flow_samples_all.txt'
@@ -27,14 +27,34 @@ z = (gaussian_kde(xy)(xy))
 ax.scatter(x, y, c=z, s=10, edgecolor='')
 
 print("main_done")
+
+# filname = 'flow_samples_all_without_trans.txt'
+# with open(filname,'r') as f:
+#     data = pickle.loads(f.read())
+# x = []
+# y = []
+# # print(len(data))
+# for j in range(len(data)-10000,len(data)):
+#     # print(j)
+#     x.append(data[j][0][0])
+#     y.append(data[j][0][1])
+#     # print(j)
+# # print(data)
+# # len(y)
+# xy =np.vstack([x,y])
+# z = (gaussian_kde(xy)(xy))
+# # x_m = sum(x) / float(len(x))
+# # y_m = sum(y) / float(len(x))
+# ax.scatter(x, y, c=z, s=10, edgecolor='')
+
 for i in range(0,10):
     filname = 'flow_samples_' + str(i) + '.txt'
     with open(filname,'r') as f:
         data = pickle.loads(f.read())
     x = []
     y = []
-    # print(len(data))
-    for j in range(len(data)-1000,len(data)):
+    print(len(data))
+    for j in range(len(data)-500,len(data)):
         x.append(data[j][0][0])
         y.append(data[j][0][1])
     # print(data)
@@ -45,7 +65,7 @@ for i in range(0,10):
     y_m = sum(y) / float(len(x))
     ax.scatter(x_m, y_m, c=1000 ,s=100, edgecolor='',marker = markers[i])
     print(i)
-plt.savefig('plotasa' + '.png')
+plt.savefig('plot' + '.png')
 # + str(i)+ 
 # import pickle
 # import numpy as np
